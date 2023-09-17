@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react';
 import { slide as Menu, State } from 'react-burger-menu'
+import NextLink from "next/link";
+import { Link as Scroll } from 'react-scroll';
 
 // Menuコンポーネントに適用させるCSS
 const styles = {
@@ -61,28 +63,44 @@ export default function BurgerMenu() {
               <button className="hover:opacity-50"
                 onClick={()=>{handleCloseMenu()}}
               >
-                Content1
+                <Scroll
+                  to="content1"
+                  smooth={true}
+                  duration={600}
+                  offset={-50}
+                  className="hover:opacity-50 hover:cursor-pointer"
+                >
+                  Content1
+                </Scroll>
               </button>
             </li>
             <li className="mb-4">
               <button className="hover:opacity-50"
                 onClick={()=>{handleCloseMenu()}}
               >
-                Content2
+                <Scroll
+                  to="content2"
+                  smooth={true}
+                  duration={600}
+                  offset={-50}
+                  className="hover:opacity-50 hover:cursor-pointer"
+                >
+                  Content2
+                </Scroll>
               </button>
             </li>
             <li className="mb-4 flex justify-center">
               <button className="mt-4 p-2 w-3/4 text-3xl border-2 rounded-lg bg-red-500 hover:opacity-50"
                 onClick={()=>{handleCloseMenu()}}
               >
-                Signup
+                <NextLink href="/signup">Signup</NextLink>
               </button>
             </li>
             <li className="mb-4 flex justify-center">
               <button className="mt-4 p-1 w-3/5 border-2 rounded-lg bg-slate-400 hover:opacity-50"
                 onClick={()=>{handleCloseMenu()}}
               >
-                Login
+                <NextLink href="/login">Login</NextLink>
               </button>
             </li>
           </ul>

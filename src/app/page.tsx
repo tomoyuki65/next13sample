@@ -14,12 +14,12 @@ export default function Home() {
         </div>
       </div>
       <div id="content1" className="flex justify-center m-1 p-1 bg-yellow-100">
-        <div className="w-full h-64 flex justify-center items-center bg-yellow-200">
+        <div className="w-full h-96 flex justify-center items-center bg-yellow-200">
           Content1
         </div>
       </div>
       <div id="content2" className="flex justify-center m-1 p-1 bg-orange-100">
-        <div className="w-full h-64 flex justify-center items-center bg-orange-200">
+        <div className="w-full h-96 flex justify-center items-center bg-orange-200">
           Content2
         </div>
       </div>

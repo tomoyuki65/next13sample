@@ -2,25 +2,25 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 // フォームの入力項目
-interface SignupFormInputs {
+interface LoginFormInputs {
   email: string;
   password: string;
 };
 
-export default function Signup() {
-  const { register, handleSubmit, formState: { errors } } = useForm<SignupFormInputs>();
+export default function Login() {
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 
-  // Signupボタンの設定
-  const signup: SubmitHandler<SignupFormInputs> = (formData) => {
+  // Loginボタンの設定
+  const login: SubmitHandler<LoginFormInputs> = (formData) => {
     console.log(formData);
   };
 
   return (
     <main className="flex flex-col justify-center items-center w-full h-screen m-auto">
       <h1 className="text-2xl mb-8 border-b-2 w-2/3 max-w-lg pb-8 text-center">
-        Signup
+        Login
       </h1>
-      <form onSubmit={handleSubmit(signup)}
+      <form onSubmit={handleSubmit(login)}
         className="grid grid-cols-1 gap-10 w-2/3 max-w-lg"
       >
         <div className="flex flex-col">
@@ -53,7 +53,7 @@ export default function Signup() {
         </div>
 
         <button type="submit" className="bg-blue-500 rounded-xl text-white h-10">
-          Signup
+          Login
         </button>
       </form>
     </main>

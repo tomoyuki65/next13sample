@@ -2,9 +2,20 @@
 import BurgerMenu from '@/components/common/BurgerMenu';
 import NextLink from "next/link";
 import { Link as Scroll } from 'react-scroll';
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  // header表示可否のフラグを設定
+  let headerDisplayFlag = false;
+  
+  // TOPページ（/）の場合のみフラグを有効にする
+  const pathName = usePathname()
+  if (pathName == '/') {
+    headerDisplayFlag = true;
+  }
+
   return (
+    <> { headerDisplayFlag &&
     <header className="w-full sticky top-0 bg-gray-100">
       <nav className="p-1 bg-gray-200">
         <div className="hidden md:flex justify-between min-w-3xl bg-gray-300">
@@ -78,5 +89,6 @@ export default function Header() {
         </div>
       </nav>
     </header>
+    } </>
   )
 }

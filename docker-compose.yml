@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  front:
+    build:
+      context: .
+      dockerfile: ./docker/local/Dockerfile
+    container_name: front
+    volumes:
+      - .:/app
+    ports:
+      - '3000:3000'
+    depends_on:
+      - redis
+  redis:
+    build:
+      context: .
+      dockerfile: ./docker/redis/Dockerfile
+    ports:
+      - '6379:6379'
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+volumes:
+    redis-data:
+        driver: local

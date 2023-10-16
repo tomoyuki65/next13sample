@@ -28,7 +28,17 @@ $ npm run dev
 ```
 $ npm run lint
 ```  
-
+  
+## 本番環境用のDockerfileビルド確認コマンド  
+docker build --no-cache -t タグ名 -f docker/prod/Dockerfile .  
+docker images  
+docker run -d -p 3000:3000 -it イメージID  
+docker ps  
+docker stop コンテナID  
+  
+## Redis用コマンド  
+docker compose exec redis redis-cli  
+  
 ## 参考記事  
 技術ブログも作成していますので、興味がある方は下記の記事を参考にしてみて下さい。  
 [・NextJS13でレスポンシブデザインのフロントエンド画面を開発する方法まとめ](https://tomoyuki65.com/how-to-develop-responsive-design-screens-with-nextjs13/)  

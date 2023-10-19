@@ -1,0 +1,83 @@
+NextJSプロジェクト作成
+
+
+
+・プロジェクト作成
+npx create-next-app@latest
+
+プロジェクト名
+その他全てYes
+
+
+・Storybookのインストール
+npx storybook init
+※./src/stories/Page.tsxの39行目の"を消す
+
+
+・React Native for Web関連をインストール
+npm i react-native-web
+npm i --save-dev @types/react-native
+
+
+※1) next.config.jsを修正
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      // Transform all direct `react-native` imports to `react-native-web`
+      'react-native$': 'react-native-web',
+    }
+    return config
+  }
+}
+
+module.exports = nextConfig
+
+
+※2).storybookにwebpack.config.jsを追加
+module.exports = async ({ config }) => {
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    'react-native$': 'react-native-web',
+    "@/components": '..',
+  };
+  return config;
+};
+
+※componentsフォルダにコンポーネント作成
+ コンポーネントのインポートは@から始める
+
+
+・storybook確認
+npm run storybook
+
+
+・jset
+npm install --save-dev jest jest-environment-jsdom @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest
+
+・jest.config.jsを作成
+const nextJest = require('next/jest')
+
+const createJestConfig = nextJest({
+  dir: './',
+})
+
+/** @type {import('jest').Config} */
+const customJestConfig = {
+  moduleDirectories: ['node_modules', '<rootDir>/'],
+  testEnvironment: 'jest-environment-jsdom',
+}
+
+module.exports = createJestConfig(customJestConfig)
+
+
+・pakage.jsonに以下のスクリプト追加
+"test": "jest",
+
+・フォルダ「__tests__」作成
+
+
+
+・firebase
+npm install firebase @types/firebase

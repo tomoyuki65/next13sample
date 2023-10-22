@@ -11,18 +11,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth"
-import { useRouter } from "next/navigation"
-//import nookies from 'nookies'
-import { setCookie, parseCookies, destroyCookie  } from 'nookies'
-// import { toast } from "react-toastify"
-
-// export interface cUser {
-//   uid: string;
-//   email: string | null;
-//   idToken: Promise<string>;
-//   // refreshToken: string;
-//   // userCredential: User;
-// };
 
 export interface currentUser {
   uid: string | null;
@@ -31,26 +19,6 @@ export interface currentUser {
   refreshToken: string | null;
   emailVerified: boolean | null;
 };
-
-// async function setC() {
-//   const idToken = "ABC";
-//   const refreshToken = "EFG";
-
-//   const res = await fetch("/api/setcookie", {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({
-//       "idToken": idToken,
-//       "refreshToken": refreshToken
-//     }),
-//   });
-//   const data = res.json();
-//   console.log(data);
-//   return data;
-// }
-
 
 // useFirebaseAuth関数
 export default function useFirebaseAuth() {

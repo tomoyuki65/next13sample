@@ -1,5 +1,6 @@
 // 'use client'
 import { useRouter } from 'next/navigation'
+import { useAuthContext } from '@/contexts/AuthContext'
 
 const emailVerified = async (uid: string, idToken: string) => {
   const router = useRouter();
@@ -30,10 +31,12 @@ const emailVerified = async (uid: string, idToken: string) => {
 };
 
 export default function EmailVerified() {
+  // const { currentUser, loading } = useAuthContext();
+  // console.log(currentUser);
   
   const uid = "111";
   const idToken = "111";
-  emailVerified(uid, idToken);
+  // emailVerified(uid, idToken);
 
   return (
     <></>

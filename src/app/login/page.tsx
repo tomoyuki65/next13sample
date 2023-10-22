@@ -1,5 +1,8 @@
 'use client'
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useAuthContext } from '@/contexts/AuthContext'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 // フォームの入力項目
 interface LoginFormInputs {
@@ -8,11 +11,27 @@ interface LoginFormInputs {
 };
 
 export default function Login() {
+  const { currentUser, loading, loginWithEmail } = useAuthContext();
+  const router = useRouter();
+
+  // ログイン済みの場合はcheckページへ飛ばす
+  useEffect(() => {
+    if (!loading && currentUser) {
+      router.push("/check");
+    }
+    // 以下のコメント直下のコードのeslintルールを部分的に無効にする
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser, loading]);
+
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 
   // Loginボタンの設定
-  const login: SubmitHandler<LoginFormInputs> = (formData) => {
-    console.log(formData);
+  const loginSubmit: SubmitHandler<LoginFormInputs> = async (
+    formData: LoginFormInputs
+  ): Promise<void>  => {
+    const email = formData.email;
+    const password = formData.password;
+    await loginWithEmail({email, password});
   };
 
   return (
@@ -20,7 +39,7 @@ export default function Login() {
       <h1 className="text-2xl mb-8 border-b-2 w-2/3 max-w-lg pb-8 text-center">
         Login
       </h1>
-      <form onSubmit={handleSubmit(login)}
+      <form onSubmit={handleSubmit(loginSubmit)}
         className="grid grid-cols-1 gap-10 w-2/3 max-w-lg"
       >
         <div className="flex flex-col">

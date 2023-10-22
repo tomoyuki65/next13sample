@@ -1,5 +1,8 @@
 'use client'
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { useAuthContext } from '@/contexts/AuthContext'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 // フォームの入力項目
 interface SignupFormInputs {
@@ -8,11 +11,26 @@ interface SignupFormInputs {
 };
 
 export default function Signup() {
+  const { currentUser, loading, signupWithEmail } = useAuthContext();
+  const router = useRouter();
+
+  // ログイン済みの場合はHomeへ飛ばす
+  useEffect(() => {
+    if (!loading && currentUser) {
+      router.push("/");
+    }
+    // 以下のコメント直下のコードのeslintルールを部分的に無効にする
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser, loading]);
+
   const { register, handleSubmit, formState: { errors } } = useForm<SignupFormInputs>();
 
   // Signupボタンの設定
   const signup: SubmitHandler<SignupFormInputs> = (formData) => {
-    console.log(formData);
+    // console.log(formData);
+    const email = formData.email;
+    const password = formData.password;
+    signupWithEmail({email, password});
   };
 
   return (

@@ -11,6 +11,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth"
+import { toast } from "react-toastify"
+import { useRouter } from 'next/navigation'
 
 export interface currentUser {
   uid: string | null;
@@ -25,6 +27,15 @@ export default function useFirebaseAuth() {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<currentUser | null>(null)
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  // ログインチェック関数
+  const checklogin = (): boolean => {
+    if (!currentUser) {
+      return false;
+    }
+    return true;
+  };
 
   // Signup関数
   const signupWithEmail = async (arg: {
@@ -121,7 +132,9 @@ export default function useFirebaseAuth() {
         console.error(error.message);
       }
 
+      toast.error("ログインできませんでした！");
       setLoading(false);
+      // router.push("/");
       return;
 
       throw error;
@@ -280,5 +293,6 @@ export default function useFirebaseAuth() {
     logout,
     destroyUser,
     getIdToken,
+    checklogin,
   };
 }

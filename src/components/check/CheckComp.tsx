@@ -3,7 +3,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import NextLink from 'next/link'
 
 export default function CheckComp() {
-  const { firebaseUser, currentUser, loading, logout, getIdToken } = useAuthContext();
+  const { firebaseUser, currentUser, loading, logout, certification } = useAuthContext();
   
   console.log("firebaseUserのログイン状況");
   console.log(firebaseUser);
@@ -16,10 +16,8 @@ export default function CheckComp() {
     await logout();
   };
 
-  const getIdTokenSubmit = async (): Promise<void>  => {
-    const id = await getIdToken();
-    console.log("再取得したidToken");
-    console.log(id);
+  const certificationSubmit = async (): Promise<void>  => {
+    await certification();
   };
 
   return (
@@ -46,8 +44,8 @@ export default function CheckComp() {
       <br />
       <br />
       <button className="ml-5 px-2 bg-gray-500 rounded-xl text-white h-10"
-        type="submit" onClick={getIdTokenSubmit}>
-          idToken再取得
+        type="submit" onClick={certificationSubmit}>
+          再認証
       </button>
       <br />
       <br />

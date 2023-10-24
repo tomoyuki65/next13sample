@@ -10,17 +10,17 @@ interface AuthContext {
   firebaseUser: User | null;
   currentUser: currentUser | null;
   loading: boolean;
-  signupWithEmail: (arg: {
+  signupWithEmail: (args: {
     email: string,
     password: string
   }) => Promise<void>;
-  loginWithEmail: (arg: {
+  loginWithEmail: (args: {
     email: string,
     password: string
   }) => Promise<void>;
+  certification:  () => Promise<void>;
   logout: () => Promise<void>;
   destroyUser: (user: User) => Promise<void>;
-  getIdToken: () => Promise<string | undefined>;
 };
 
 type AuthProviderProps = {
@@ -39,9 +39,9 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     loading,
     signupWithEmail,
     loginWithEmail,
+    certification,
     logout,
-    destroyUser,
-    getIdToken
+    destroyUser
   } = useFirebaseAuth();
 
   // AuthContextオブジェクトの定義
@@ -51,9 +51,9 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     loading: loading,
     signupWithEmail: signupWithEmail,
     loginWithEmail: loginWithEmail,
+    certification: certification,
     logout: logout,
-    destroyUser: destroyUser,
-    getIdToken: getIdToken
+    destroyUser: destroyUser
   };
 
   return <AuthCtx.Provider value={AuthContext}>{children}</AuthCtx.Provider>;

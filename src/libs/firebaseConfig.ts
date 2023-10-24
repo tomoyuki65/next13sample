@@ -29,4 +29,3 @@ export const auth = getAuth(app);
 
 // 認証状態の永続性を変更
 auth.setPersistence(inMemoryPersistence);
-// auth.setPersistence(browserLocalPersistence);

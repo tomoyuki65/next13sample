@@ -11,6 +11,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth"
+import axios from '@/libs/axios/axios'
+import certificationRequests from "@/libs/axios/certificationRequests"
 import { toast } from "react-toastify"
 import { useRouter } from 'next/navigation'
 
@@ -38,47 +40,56 @@ export default function useFirebaseAuth() {
   };
 
   // Signup関数
-  const signupWithEmail = async (arg: {
+  const signupWithEmail = async (args: {
     email: string,
     password: string,
   }): Promise<void> => {
     setLoading(true);
 
     try {
-      const credential = await createUserWithEmailAndPassword(auth, arg.email, arg.password);
+      const credential = await createUserWithEmailAndPassword(auth, args.email, args.password);
       
       const user = credential.user;
       const idToken = await user.getIdToken();
       const refreshToken = user.refreshToken;
 
-      // refreshTokenをサーバーサイドクッキーにセットする
-      // 実際はバックエンドAPIのSignup処理内で行う
-      // ヘッダーにidTokenを付与
-      // name, name_kana, refreshTokenをポスト
-      const url = "http://localhost:3000/api/setcookie";
-      const res = await fetch(url, {
-        method: 'POST',
+      // Session作成
+      const config1 = {
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          "refresh_token": refreshToken
-        }),
-        cache: 'no-store'
-      });
-      // response結果にサーバーサイドクッキーが付与される
-      console.log(res);
+      };
+      const data1 = {
+        "refresh_token": refreshToken
+      };
+      await axios.post(certificationRequests.fetchSignup, data1, config1);
 
-      // 認証メール送信
+      // メール認証用のリンクを作成
+      const config2 = {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      };
+      const data2 = {
+        "mode": "verifyEmail",
+        "email": args.email
+      };
+      const res1 = await axios.post(certificationRequests.fetchGetFirebaseCustomLink, data2, config2);
+      const link = res1.data.link;
 
+      // リンクを使ってメール送信
+
+      console.log("Signup処理が成功！");
       setLoading(false);
       return;
 
     } catch (error) {
       if (error instanceof Error) {
         console.error(error.message);
-      }
+      };
 
+      console.log("Signup処理が失敗！！！");
       setLoading(false);
       return;
 
@@ -87,44 +98,32 @@ export default function useFirebaseAuth() {
   };
 
   // Login関数
-  const loginWithEmail = async (arg: {
+  const loginWithEmail = async (args: {
     email: string,
     password: string,
   }): Promise<void> => {
     setLoading(true);
 
     try {
-      const credential = await signInWithEmailAndPassword(auth, arg.email, arg.password);
-      
+      const credential = await signInWithEmailAndPassword(auth, args.email, args.password);
       const user = credential.user;
       const idToken = await user.getIdToken();
       const refreshToken = user.refreshToken;
 
-      // ログイン処理時にrefreshTokenをサーバーサイドクッキーにセットする
-      const url = "http://localhost:3000/api/setcookie";
-      const res = await fetch(url, {
-        method: 'POST',
+      // Session作成
+      const config = {
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          "refreshToken": refreshToken
-        }),
-        cache: 'no-store'
-      });
-      console.log(res);
-
-      const currentUser: currentUser = {
-        uid: user.uid,
-        email: user.email,
-        idToken: String(await user.getIdToken()),
-        refreshToken: user.refreshToken,
-        emailVerified: user.emailVerified
       };
-      setCurrentUser(currentUser);
+      const data = {
+        "refresh_token": refreshToken
+      };
+      await axios.post(certificationRequests.fetchCreateSession, data, config);
 
+      console.log("Login処理成功！");
       setLoading(false);
-      // リダイレクト処理
       return;
 
     } catch (error) {
@@ -133,12 +132,52 @@ export default function useFirebaseAuth() {
       }
 
       toast.error("ログインできませんでした！");
+      console.log("Login処理失敗！！！");
       setLoading(false);
       // router.push("/");
       return;
 
       throw error;
     }
+  };
+
+  // 再認証用の関数
+  const certification = async (): Promise<void> => {
+    setLoading(true);
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      };
+      const res = await axios.get(certificationRequests.fetchSignup, config);
+
+      // ログインさせる
+      const currentUser: currentUser = {
+        uid: res.data.uid,
+        email: res.data.email,
+        idToken: res.data.idToken,
+        refreshToken: res.data.refreshToken,
+        emailVerified: res.data.emailVerified
+      };
+      setCurrentUser(currentUser);
+
+      console.log("再認証処理が成功！");
+      setLoading(false);
+      return;
+
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+
+      console.log("再認証処理が失敗！！！");
+      setLoading(false);
+      return;
+
+      throw error;
+    };
   };
 
   // Logout関数
@@ -174,62 +213,9 @@ export default function useFirebaseAuth() {
     }
   };
 
-  // refreshTokenからidToken取得
-  const getIdToken = async (): Promise<string | undefined> => {
-    setLoading(true);
-    try {
-      const url = "http://localhost:3000/api/refresh";
-      const res = await fetch(url, {
-        method: 'GET',
-        cache: 'no-store'
-      });
-      const data = await res.json();
-      console.log("レスポンス確認！");
-      console.log(data.uid);
-      console.log(data.email);
-      console.log(data.idToken);
-      console.log(data.refreshToken);
-      console.log(String(data.emailVerified));
-
-      // ログインさせる
-      const currentUser: currentUser = {
-        uid: data.uid,
-        email: data.email,
-        idToken: data.idToken,
-        refreshToken: data.refreshToken,
-        emailVerified: data.emailVerified
-      };
-      setCurrentUser(currentUser);
+  // メール認証用のメール送信処理
 
 
-      // const url = "https://securetoken.googleapis.com/v1/token?key=" + process.env.FIREBASE_API_KEY;
-      // // const res = await fetch(url, { cache: 'no-store' });
-      // const res = await fetch(url, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     "grant_type": "refresh_token",
-      //     "refresh_token": "AMf-vBx_gGq9rvxG2Xy7hmpUDpUoTLYn6Kjb4UL-zhsRicSyO5tcg1PKNrojWOZjQF-G5WGtMVKcYrhT4516CVwPnrrj-SBCUosiKy_U-IVWEq0ifG3198NCtoRyNN3xvNyOQAIfSlETp1a4p7vrXxu1vO5kk_1D91c7QTgsRRQ1LrBbDW18OfNijuhSN65Xk-p-WMJ-0J4vsv0eIeIaa5-h_7QFaktNmA"
-      //   }),
-      // });
-      // const data = await res.json();
-      // console.log(auth.currentUser);
-
-      setLoading(false);
-      return data.idToken;
-
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error(error.message);
-      }
-      setLoading(false);
-      return undefined;
-
-      throw error;
-    }
-  };
 
   // 退会用関数
   const destroyUser = async (user: User): Promise<void> => {
@@ -290,9 +276,9 @@ export default function useFirebaseAuth() {
     loading,
     signupWithEmail,
     loginWithEmail,
+    certification,
     logout,
     destroyUser,
-    getIdToken,
     checklogin,
   };
 }

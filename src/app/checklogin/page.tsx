@@ -4,7 +4,7 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import { useRouter } from "next/navigation"
 
 export default function CheckLogin() {
-  const { firebaseUser, currentUser, loading, logout, getIdToken } = useAuthContext();
+  const { firebaseUser, currentUser, loading, logout, certification } = useAuthContext();
   
   console.log("firebaseUserのログイン状況");
   console.log(firebaseUser);
@@ -16,7 +16,7 @@ export default function CheckLogin() {
   // if (!currentUser) {
   //   router.push("/");
   // }
-  
+
   // const cookies = parseCookies();
   // console.log("クッキー表示");
   // console.log(cookies);
@@ -32,10 +32,8 @@ export default function CheckLogin() {
     await logout();
   };
 
-  const getIdTokenSubmit = async (): Promise<void>  => {
-    const id = await getIdToken();
-    console.log("再取得したidToken");
-    console.log(id);
+  const certificationSubmit = async (): Promise<void>  => {
+    await certification();
   };
 
   return (
@@ -62,7 +60,7 @@ export default function CheckLogin() {
       <br />
       <br />
       <button className="ml-5 px-2 bg-gray-500 rounded-xl text-white h-10"
-        type="submit" onClick={getIdTokenSubmit}>
+        type="submit" onClick={certificationSubmit}>
           idToken再取得
       </button>
       <br />

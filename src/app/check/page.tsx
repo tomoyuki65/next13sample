@@ -4,6 +4,7 @@ import NextLink from 'next/link'
 import CheckComp from '@/components/check/CheckComp'
 //import { getAllCookies } from '@/utils/getCookies'
 // import { parseCookies } from "nookies"
+import { authAdmin } from '@/libs/firebaseAdminConfig'
 
 export default function Check() {
   //const cookies = getAllCookies();

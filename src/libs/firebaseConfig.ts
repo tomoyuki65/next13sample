@@ -14,15 +14,7 @@ const firebaseConfig = {
 };
 
 // Firebaseの初期化＆Appオブジェクトの作成
-const getFirebaseApp = () => {
-  if (typeof window !== "undefined" && !getApps().length) {
-    return initializeApp(firebaseConfig);
-  } else {
-    return getApp();
-  }
-};
-
-const app = getFirebaseApp();
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // FirebaseAppに関連するAuthインスタンスを取得
 export const auth = getAuth(app);

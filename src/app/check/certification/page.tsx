@@ -2,22 +2,12 @@
 import { useAuthContext } from '@/contexts/AuthContext'
 import NextLink from 'next/link'
 
-export default function CheckComp() {
-  const { firebaseUser, currentUser, loading, logout, certification } = useAuthContext();
-  
-  console.log("firebaseUserのログイン状況");
-  console.log(firebaseUser);
-  
-  console.log("currentUserのログイン状況");
-  console.log(currentUser);
+export default function CheckCertificaton() {
+  const { firebaseUser, currentUser, loading, logout } = useAuthContext();
 
   // ログアウトボタン
   const logoutSubmit = async (): Promise<void>  => {
     await logout();
-  };
-
-  const certificationSubmit = async (): Promise<void>  => {
-    await certification();
   };
 
   return (
@@ -37,21 +27,28 @@ export default function CheckComp() {
       <p className='pl-2'>refreshToken: { currentUser?.refreshToken }</p>
       <p className='pl-2'>emailVerified: { String(currentUser?.emailVerified) }</p>
       <br />
+      <br />
       <button className="ml-5 px-2 bg-gray-500 rounded-xl text-white h-10"
         type="submit" onClick={logoutSubmit}>
           ログアウト
       </button>
       <br />
       <br />
-      <button className="ml-5 px-2 bg-gray-500 rounded-xl text-white h-10"
+      <NextLink href="/withdrawal">to 退会ページへ</NextLink>
+      <br />
+      <br />
+      {/* <button className="ml-5 px-2 bg-gray-500 rounded-xl text-white h-10"
         type="submit" onClick={certificationSubmit}>
           再認証
       </button>
       <br />
+      <br /> */}
+      {/* <NextLink href="/checklogin">to CheckLoginページへ</NextLink>
       <br />
-      <NextLink href="/checklogin">to CheckLoginページへ</NextLink>
       <br />
+      <NextLink href="/reset-password">to パスワードリセットページへ</NextLink>
       <br />
+      <br /> */}
     </>
-  )
-}
+  );
+};

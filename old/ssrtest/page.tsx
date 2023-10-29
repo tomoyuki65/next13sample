@@ -1,4 +1,4 @@
-import ClComp from "@/components/check/ClComp"
+import ClComp from "../checkC/ClComp"
 
 export default function Ssrtest() {
   const uid = "ABC123";

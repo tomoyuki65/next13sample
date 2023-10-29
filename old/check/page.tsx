@@ -1,7 +1,7 @@
 //'use client'
 import { useAuthContext } from '@/contexts/AuthContext'
 import NextLink from 'next/link'
-import CheckComp from '@/components/check/CheckComp'
+// import CheckComp from '../checkC/CheckComp'
 //import { getAllCookies } from '@/utils/getCookies'
 // import { parseCookies } from "nookies"
 import { authAdmin } from '@/libs/firebaseAdminConfig'
@@ -41,7 +41,7 @@ export default function Check() {
 
   return (
     <>
-      <CheckComp />
+      {/* <CheckComp /> */}
       {/* <h1>Checkページ</h1>
       <br />
       <h2>ロード：{ loading == true ? "...読み込み中" : "" }</h2>

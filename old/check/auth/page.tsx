@@ -41,7 +41,7 @@ export default function CheckAuth() {
           <h1>Auth用のチェックページ</h1>
           <br />
           { mode == "verifyEmail" && <AuthEmailVerification oobCode={oobCode} /> }
-          { mode == "resetPassword" && <AuthPasswordReset /> }
+          { mode == "resetPassword" && <AuthPasswordReset mode={mode} oobCode={oobCode} /> }
           { mode == "C" && <AuthVerifyAndChangeEmail /> }
       </>
   )

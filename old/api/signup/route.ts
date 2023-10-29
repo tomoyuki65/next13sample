@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }),
   });
   const data = await res.json();
-  const uid = data.users[0].localId;
+  const uid = data.users[0].uid;
   const email = data.users[0].email;
   console.log("idTokenから取得したユーザー情報");
   console.log(uid);

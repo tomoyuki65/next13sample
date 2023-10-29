@@ -5,16 +5,13 @@ import {
   User,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
-  // sendEmailVerification,
-  signInWithCustomToken,
+  sendEmailVerification,
   deleteUser,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth"
 import axios from '@/libs/axios/axios'
 import certificationRequests from "@/libs/axios/certificationRequests"
-import { toast } from "react-toastify"
-import { useRouter } from 'next/navigation'
 
 export interface currentUser {
   uid: string | null;
@@ -29,21 +26,12 @@ export default function useFirebaseAuth() {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<currentUser | null>(null)
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  // ログインチェック関数
-  const checklogin = (): boolean => {
-    if (!currentUser) {
-      return false;
-    }
-    return true;
-  };
 
   // Signup関数
   const signupWithEmail = async (args: {
     email: string,
     password: string,
-  }): Promise<void> => {
+  }): Promise<boolean> => {
     setLoading(true);
 
     try {
@@ -54,44 +42,35 @@ export default function useFirebaseAuth() {
       const refreshToken = user.refreshToken;
 
       // Session作成
-      const config1 = {
+      const config = {
         headers: {
           'Authorization': `Bearer ${idToken}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         },
       };
-      const data1 = {
+      const data = {
         "refresh_token": refreshToken
       };
-      await axios.post(certificationRequests.fetchSignup, data1, config1);
+      await axios.post(certificationRequests.fetchSignup, data, config);
 
-      // メール認証用のリンクを作成
-      const config2 = {
-        headers: {
-          'Content-Type': 'application/json'
-        },
+      // 認証メール送信
+      const actionCodeSettings = {
+        url: "http://localhost:3000/check/certification"
       };
-      const data2 = {
-        "mode": "verifyEmail",
-        "email": args.email
-      };
-      const res1 = await axios.post(certificationRequests.fetchGetFirebaseCustomLink, data2, config2);
-      const link = res1.data.link;
+      await sendEmailVerification(user, actionCodeSettings);
 
-      // リンクを使ってメール送信
-
-      console.log("Signup処理が成功！");
       setLoading(false);
-      return;
+      return true;
 
     } catch (error) {
       if (error instanceof Error) {
         console.error(error.message);
       };
 
-      console.log("Signup処理が失敗！！！");
+      console.log("Signup処理ができませんでした。");
       setLoading(false);
-      return;
+      return false;
 
       throw error;
     }
@@ -101,7 +80,7 @@ export default function useFirebaseAuth() {
   const loginWithEmail = async (args: {
     email: string,
     password: string,
-  }): Promise<void> => {
+  }): Promise<boolean> => {
     setLoading(true);
 
     try {
@@ -114,7 +93,8 @@ export default function useFirebaseAuth() {
       const config = {
         headers: {
           'Authorization': `Bearer ${idToken}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         },
       };
       const data = {
@@ -122,20 +102,17 @@ export default function useFirebaseAuth() {
       };
       await axios.post(certificationRequests.fetchCreateSession, data, config);
 
-      console.log("Login処理成功！");
       setLoading(false);
-      return;
+      return true;
 
     } catch (error) {
       if (error instanceof Error) {
         console.error(error.message);
       }
 
-      toast.error("ログインできませんでした！");
-      console.log("Login処理失敗！！！");
+      console.log("Loginできませんでした。");
       setLoading(false);
-      // router.push("/");
-      return;
+      return false;
 
       throw error;
     }
@@ -148,10 +125,11 @@ export default function useFirebaseAuth() {
     try {
       const config = {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         },
       };
-      const res = await axios.get(certificationRequests.fetchSignup, config);
+      const res = await axios.get(certificationRequests.fetchCertification, config);
 
       // ログインさせる
       const currentUser: currentUser = {
@@ -163,7 +141,6 @@ export default function useFirebaseAuth() {
       };
       setCurrentUser(currentUser);
 
-      console.log("再認証処理が成功！");
       setLoading(false);
       return;
 
@@ -172,7 +149,6 @@ export default function useFirebaseAuth() {
         console.error(error.message);
       }
 
-      console.log("再認証処理が失敗！！！");
       setLoading(false);
       return;
 
@@ -185,18 +161,19 @@ export default function useFirebaseAuth() {
     setLoading(true);
 
     try {
-      // logoutのAPIを実行し、currentUserとクッキーを削除
-      const url = "http://localhost:3000/api/logout";
-      const res = await fetch(url, {
-        method: 'GET',
-        cache: 'no-store'
-      });
-      const data = await res.json();
-      console.log(data);
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
+      };
+      await axios.get(certificationRequests.fetchDeleteSession, config);
       setCurrentUser(null);
 
-      await signOut(auth);
-      setFirebaseUser(null);
+      if (firebaseUser) {
+        await signOut(auth);
+        setFirebaseUser(null);
+      };
 
       setLoading(false);
       return;
@@ -206,6 +183,7 @@ export default function useFirebaseAuth() {
         console.error(error.message);
       }
 
+      console.log("ログアウトに失敗しました。");
       setLoading(false);
       return;
 
@@ -213,21 +191,105 @@ export default function useFirebaseAuth() {
     }
   };
 
-  // メール認証用のメール送信処理
+  // パスワードリセット用関数
+  // const resetPassword = async (email: string): Promise<boolean> => {
+  //   setLoading(true);
 
+  //   try {
 
+  //     // メール認証用のリンクを作成
+  //     const config = {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Cache-Control': 'no-cache'
+  //       },
+  //     };
+  //     const data = {
+  //       "mode": "resetPassword",
+  //       "email": email
+  //     };
+  //     const res = await axios.post(certificationRequests.fetchGetFirebaseCustomLink, data, config);
+  //     const link = res.data.link;
+
+  //     // リンクでメール送信
+
+  //     setLoading(false);
+  //     return true;
+
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       console.error(error.message);
+  //     }
+
+  //     setLoading(false);
+  //     return false;
+
+  //     throw error;
+  //   };
+  // };
+
+  // const applyActionCode = async (
+  //   mode: string,
+  //   oobCode: string,
+  //   password: string | null,
+  //   email: string | null 
+  // ): Promise<boolean> => {
+  //   setLoading(true);
+
+  //   console.log("デバッグ開始！！！");
+  //   try {
+  //     const config = {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Cache-Control': 'no-cache',
+  //       },
+  //     };
+  //     const data = {
+  //       "mode": mode,
+  //       "oobCode": oobCode,
+  //       "password": password,
+  //       "email": email,
+  //     };
+  //     const res = await axios.post(certificationRequests.fetchApplyActionCode, data, config);
+
+  //     setLoading(false);
+  //     return true;
+
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       console.error(error.message);
+  //     }
+
+  //     setLoading(false);
+  //     return false;
+
+  //     throw error;
+  //   };
+
+  // };
 
   // 退会用関数
-  const destroyUser = async (user: User): Promise<void> => {
+  const destroyUser = async (password: string): Promise<boolean> => {
     setLoading(true);
 
+    if (!currentUser) {
+      setLoading(false);
+      return false;
+    };
+
     try {
+      const email = String(currentUser.email);
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const user = credential.user;
+      
+      // Firebaseのユーザー削除
       await deleteUser(user);
 
-      // 通知＆トップページへリダイレクト
+      // ログアウト処理
+      await logout();
 
       setLoading(false);
-      return;
+      return true;
 
     } catch (error) {
       if (error instanceof Error) {
@@ -235,11 +297,11 @@ export default function useFirebaseAuth() {
       }
 
       setLoading(false);
-      return undefined;
+      return false;
 
       throw error;
-    }
-  }
+    };
+  };
 
   // onAuthStateChanged関数における、
   // ユーザーの状態管理用パラメータの設定
@@ -276,9 +338,8 @@ export default function useFirebaseAuth() {
     loading,
     signupWithEmail,
     loginWithEmail,
-    certification,
     logout,
+    certification,
     destroyUser,
-    checklogin,
   };
 }

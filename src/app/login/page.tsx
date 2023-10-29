@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'react-toastify'
 
 // フォームの入力項目
 interface LoginFormInputs {
@@ -14,24 +15,29 @@ export default function Login() {
   const { currentUser, loading, loginWithEmail } = useAuthContext();
   const router = useRouter();
 
-  // ログイン済みの場合はcheckページへ飛ばす
+  // ログイン済みの場合はTopページへ飛ばす
   useEffect(() => {
-    if (!loading && currentUser) {
-      router.push("/check");
+    if (currentUser && currentUser.emailVerified == true) {
+      router.push("/");
     }
     // 以下のコメント直下のコードのeslintルールを部分的に無効にする
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, loading]);
+  }, []);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 
   // Loginボタンの設定
-  const loginSubmit: SubmitHandler<LoginFormInputs> = async (
-    formData: LoginFormInputs
-  ): Promise<void>  => {
+  const loginSubmit: SubmitHandler<LoginFormInputs> = async (formData) => {
     const email = formData.email;
     const password = formData.password;
-    await loginWithEmail({email, password});
+    const res = await loginWithEmail({ email, password });
+
+    if (res) {
+      router.push("/check/certification");
+    } else {
+      toast.error("Loginできませんでした。");
+      router.push("/login");
+    };
   };
 
   return (

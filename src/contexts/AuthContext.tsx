@@ -13,14 +13,14 @@ interface AuthContext {
   signupWithEmail: (args: {
     email: string,
     password: string
-  }) => Promise<void>;
+  }) => Promise<boolean>;
   loginWithEmail: (args: {
     email: string,
     password: string
-  }) => Promise<void>;
-  certification:  () => Promise<void>;
+  }) => Promise<boolean>;
   logout: () => Promise<void>;
-  destroyUser: (user: User) => Promise<void>;
+  certification:  () => Promise<void>;
+  destroyUser: (pasword: string) => Promise<boolean>;
 };
 
 type AuthProviderProps = {
@@ -39,8 +39,8 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     loading,
     signupWithEmail,
     loginWithEmail,
-    certification,
     logout,
+    certification,
     destroyUser
   } = useFirebaseAuth();
 
@@ -51,8 +51,8 @@ export function AuthContextProvider({ children }: AuthProviderProps) {
     loading: loading,
     signupWithEmail: signupWithEmail,
     loginWithEmail: loginWithEmail,
-    certification: certification,
     logout: logout,
+    certification: certification,
     destroyUser: destroyUser
   };
 

@@ -1,7 +1,7 @@
 'use client'
-import AuthEmailVerification from '@/components/auth/AuthEmailVerification'
-import AuthPasswordReset from '@/components/auth/AuthPasswordReset'
-import AuthVerifyAndChangeEmail from '@/components/auth/AuthVerifyAndChangeEmail'
+import AuthEmailVerification from '../../auth/AuthEmailVerification'
+import AuthPasswordReset from '../../auth/AuthPasswordReset'
+import AuthVerifyAndChangeEmail from '../../auth/AuthVerifyAndChangeEmail'
 import { useSearchParams } from 'next/navigation'
 // import { authAdmin } from '@/libs/firebaseAdminConfig'
 

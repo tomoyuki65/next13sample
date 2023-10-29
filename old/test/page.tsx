@@ -12,7 +12,7 @@ import nookies from 'nookies'
 //import { resolve } from 'path';
 import { getAllCookies } from "@/utils/getCookies";
 //import { cookies } from 'next/headers';
-import ClientComp from '@/components/ClientComp';
+import ClientComp from '../ClientComp';
 
 const getIdToken = async () => {
   await fetch("http://localhost:3000/api/login", {

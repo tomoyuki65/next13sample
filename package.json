@@ -21,7 +21,7 @@
     "eslint-config-next": "13.4.19",
     "firebase": "^10.5.0",
     "firebase-admin": "^11.11.0",
-    "next": "13.4.19",
+    "next": "^13.5.0",
     "nookies": "^2.5.2",
     "postcss": "8.4.29",
     "react": "18.2.0",
@@ -37,6 +37,7 @@
     "node": "18.13.0"
   },
   "devDependencies": {
-    "encoding": "^0.1.13"
+    "encoding": "^0.1.13",
+    "local-ssl-proxy": "^2.0.5"
   }
 }

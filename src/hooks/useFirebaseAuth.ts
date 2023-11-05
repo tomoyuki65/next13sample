@@ -11,6 +11,7 @@ import {
   signOut,
 } from "firebase/auth"
 import axios from '@/libs/axios/axios'
+import axiosBk from '@/libs/axios/axios-bk'
 import certificationRequests from "@/libs/axios/certificationRequests"
 
 export interface currentUser {
@@ -126,7 +127,7 @@ export default function useFirebaseAuth() {
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-store'
         },
       };
       const res = await axios.get(certificationRequests.fetchCertification, config);
@@ -303,6 +304,39 @@ export default function useFirebaseAuth() {
     };
   };
 
+  const createSession = async (): Promise<void> => {
+    try {
+      // Session作成
+      const config = {
+        headers: {
+          // "Access-Control-Allow-Origin": "https://localhost:3000",
+          // 'Origin': 'https://localhost:3000',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'withCredentials': true,
+          'Cache-Control': 'no-store'
+        },
+      };
+      const res = await axiosBk.get("/api/test/v1/create-session", config);
+      console.log(res.data);
+      console.log(res.status);
+      console.log(res.data.message);
+      console.log(res.headers["set-cookie"]);
+
+      return;
+
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+
+      console.log("createSessionに失敗しました。");
+      setLoading(false);
+      return;
+
+      throw error;
+    }
+  };
+
   // onAuthStateChanged関数における、
   // ユーザーの状態管理用パラメータの設定
   const nextOrObserver = async (user: User | null): Promise<void> => {
@@ -341,5 +375,6 @@ export default function useFirebaseAuth() {
     logout,
     certification,
     destroyUser,
+    createSession,
   };
 }

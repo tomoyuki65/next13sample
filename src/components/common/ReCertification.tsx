@@ -11,7 +11,7 @@ export default function ReCertification() {
     };
     // 以下のコメント直下のコードのeslintルールを部分的に無効にする
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentUser, loading]);
 
   return (
     <>

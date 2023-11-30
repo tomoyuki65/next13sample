@@ -1,0 +1,83 @@
+'use client'
+
+import { useState } from 'react'
+import { Text, TextInput, View, Pressable } from 'react-native'
+
+import { useForm, Controller, SubmitHandler } from 'react-hook-form'
+import * as Yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+
+type FormDataInfo = {
+  email: string;
+  password: string;
+};
+
+export default function Rnw() {
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().required("メールアドレスは必須です。!!").email("メールアドレスは有効なアドレス形式で入力して下さい。"),
+    password: Yup.string().required("パスワードは必須です。")
+  });
+  const formOptions = { resolver: yupResolver(validationSchema) };
+  // const { register, handleSubmit, formState } = useForm(formOptions);
+  // const { errors } = formState;  
+
+  // const [text, setText] = useState('');
+
+  //{...register('email')}
+
+  const { control, handleSubmit, formState} = useForm(formOptions);
+  const { errors } = formState;
+  // const onSubmit = (data: any) => console.log(data);
+  // const { name, ref, onChange, onBlur } = register('password');
+
+  const onSubmit: SubmitHandler<FormDataInfo> = (data: any, e: any) => console.log(data, e);
+
+  return (
+    <>
+      <h1>React Native For Webのテスト</h1>
+      <Controller
+        control={control}
+        name={"email"}
+        defaultValue={"aaabbb"}
+        render={({
+          field: { onChange, value, onBlur, name },
+          formState: { errors },
+        }) => (
+          <View>
+            <TextInput
+              // このpropsにautoCompleteTypeなど諸々乗っかってくる
+              // {...props}
+              value={value || ""}
+              onBlur={onBlur}
+              onChangeText={onChange}
+            />
+            {/* バリエーションエラー表示 */}
+            {errors[name] && (
+              <Text>
+                {errors[name]?.message}
+              </Text>
+            )}
+            <Pressable
+              onPress={() => handleSubmit(onSubmit)()}
+            >
+              <Text>BUTTON</Text>
+            </Pressable>
+          </View>
+        )}
+      />
+
+      {/* <View style={{padding: 10}}>
+        <TextInput
+          style={{height: 40}}
+          placeholder="Type here to translate!"
+          // onChangeText={newText => setText(newText)}
+          // defaultValue={text}
+          defaultValue={...register('email')}
+        />
+        <Text style={{padding: 10, fontSize: 42}}>
+          {text.split(' ').map((word) => word && '?').join(' ')}
+        </Text>
+    </View> */}
+    </>
+  )
+}
